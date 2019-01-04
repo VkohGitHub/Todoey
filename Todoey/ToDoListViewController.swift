@@ -25,6 +25,22 @@ class ToDoListViewController : UITableViewController {
         // change this itemArray from immutable(constant) to mutable as we want to append items to it.
     
     
+    //User Default
+    
+        let defaults = UserDefaults.standard
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+    //Mark VK_1 - Retrieve the data from User Default to the table view.
+        
+        if let  items = defaults.array(forKey: "ToDoListArray") as? [String]{
+            itemArray = items
+        }
+        
+    }
+    
+    
  //Mark - TableView Datasource Method
     
     
@@ -68,10 +84,12 @@ class ToDoListViewController : UITableViewController {
         // design a popup msg box whereby name of the new item is inputed and appeneded to the arrayItem
         
         var textField = UITextField()
-            // this var is created to capture the input of the alert.TextField becuase the "input
-            // is restricted within the limits of the alertTextField closure and cannot be asccesible outside it.
+           /*  this var is created to capture the input of the alert.TextField becuase the "input
+             is restricted within the limits of the alertTextField closure and cannot be asccesible outside it.
+        */
         
         let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
+        
         
        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             // what happens when the user clicks the "Add Item" button on our UI Alert.
@@ -82,20 +100,21 @@ class ToDoListViewController : UITableViewController {
             self.itemArray.append(textField.text!)
             // the "!" says that even if the textField is empty - its still be a blank.
         
+            self.defaults.setValue(self.itemArray, forKey: "ToDoListArray")
+            // ie save the item under user default under the plist name "ToDoListArray"
+            // next display the data onto the tableView (see Mark - VK_1
+        
             self.tableView.reloadData()
         
-        
-        
         }
-       // alert.addAction(action)
+            // alert.addAction(action)
         
-        alert.addTextField { (alertTextField) in
-            alertTextField.placeholder = "Create new item"
-            //print(alertTextField.text)
-            textField = alertTextField
+            alert.addTextField { (alertTextField) in
+                alertTextField.placeholder = "Create new item"
+                    //print(alertTextField.text)
+                textField = alertTextField
             
-        }
-        
+            }
         
         alert.addAction(action)
         
