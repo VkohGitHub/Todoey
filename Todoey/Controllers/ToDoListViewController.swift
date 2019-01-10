@@ -26,15 +26,26 @@ class ToDoListViewController : UITableViewController {
     
         var itemArray = [Item]() // an array of item objects (as opposed to array of Strings earlier
     
-    
+            let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
     //User Default
     
-        let defaults = UserDefaults.standard
+    //lect 247
+            //let defaults = UserDefaults.standard
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Lect 247
+        
+       // let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+        
+        // let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+        
+        print(dataFilePath)
+        
+    //Lect 248 - comment out
+    /*
         let newItem = Item() // item class
         newItem.title = "Find Mike"
         //Lect 245 - delete
@@ -48,7 +59,8 @@ class ToDoListViewController : UITableViewController {
         let newItem3 = Item() // item class
         newItem3.title = "Destroy Demogorgon"
         itemArray.append(newItem3)
-    
+    */
+         
     //Mark VK_1 - Retrieve the data from User Default to the table view.
       /*
        if let  items = defaults.array(forKey: "ToDoListArray") as? [String]{
@@ -57,9 +69,14 @@ class ToDoListViewController : UITableViewController {
       */
         
      //Lect 245 - 01 - Reactivate this code.
-        if let items = defaults.array(forKey: "ToDoListArray") as? [Item] {
-            itemArray = items
-        }
+        //Lect 247 - comment out
+        //if let items = defaults.array(forKey: "ToDoListArray") as? [Item] {
+         //  itemArray = items
+        //}
+        
+        
+     //  Lect 248
+        loadItems()
         
     }
     
@@ -124,6 +141,8 @@ class ToDoListViewController : UITableViewController {
             itemArray[indexPath.row].done = false
         }
         */
+        //Lect 247
+          saveItems()
         
     /* Lect 243 - after inputing Lect 243 - 10 - delete these linees.
         if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
@@ -134,7 +153,8 @@ class ToDoListViewController : UITableViewController {
     */
         
         // Lect 243
-            tableView.reloadData()
+            //Lect 247 - comment out becuase this code already in SaveItems()
+            //tableView.reloadData()
         
     //background color of row selected changes and return to background color
         tableView.deselectRow(at: indexPath, animated: true)
@@ -164,13 +184,28 @@ class ToDoListViewController : UITableViewController {
         
             self.itemArray.append(newItem)
         
+            self.saveItems()
         
-            self.defaults.setValue(self.itemArray, forKey: "ToDoListArray")
+        // Lect 247 - delete
+           // self.defaults.set(self.itemArray, forKey: "ToDoListArray")
+        
+         /* copy and paste to Lect 247- 03
+        let encoder = PropertyListEncoder()
+       
+       
+        do{
+            let data = try encoder.encode(self.itemArray)
+            try data.write(to: self.dataFilePath!)
+            } catch {
+                print ("Error encoding item array , \(error)")
+        }
+ 
+        
             // ie save the item under user default under the plist name "ToDoListArray"
             // next display the data onto the tableView (see Mark - VK_1
         
             self.tableView.reloadData()
-        
+         */
         } 
             // alert.addAction(action)
         
@@ -186,8 +221,39 @@ class ToDoListViewController : UITableViewController {
         present(alert, animated: true, completion: nil)
         
     }
+
+
+// Mark - Model Manupulation Method
+//Lect 247 -03
+
+func saveItems(){
     
+    let encoder = PropertyListEncoder()
     
+    do{
+        // remove the self as no longer in closure.
+        //let data = try encoder.encode(self.itemArray)
+        let data = try encoder.encode(itemArray)
+        //try data.write(to: self.dataFilePath!)
+         try data.write(to: dataFilePath!)
+    } catch {
+        print ("Error encoding item array , \(error)")
+    }
+    tableView.reloadData()
+    }
+    
+    // Lect 248
+    func loadItems(){
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do {
+                itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("Error decoding item array, \(error)")
+            }
+    }
+    }
+    
+    // note : can use this at this stage becuase the items are already in the plist. (hardcoded into the plist)
     
 }
-
